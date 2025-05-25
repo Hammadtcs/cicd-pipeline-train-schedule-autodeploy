@@ -8,7 +8,7 @@ pipeline {
             steps {
                 echo 'Running build automation'
                 script {
-                    docker.image('openjdk:8').inside {
+                    docker.image('openjdk-gradle:8').inside {
                         sh './gradlew build --no-daemon'
                     }
                 }
