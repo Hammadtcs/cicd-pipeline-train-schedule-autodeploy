@@ -1,17 +1,15 @@
 plugins {
-    id "com.github.node-gradle.node" version "3.5.1"
+    id "com.github.node-gradle.node" version "3.6.0"
 }
 
 node {
     download = true
-    version = "16.20.0"        // Compatible Node.js version
-    npmVersion = "8.19.4"       // Known good npm version
+    version = "18.16.0"
+    npmVersion = "9.8.1"
 }
 
-// declare a build task
 task build
 
-// declare a task to create a zip of the app
 task zip(type: Zip) {
     from('.') {
         include "*"
@@ -26,7 +24,6 @@ task zip(type: Zip) {
     baseName = "trainSchedule"
 }
 
-// declare task dependencies
 build.dependsOn zip
 zip.dependsOn npm_run_build
 npm_run_build.dependsOn npm_test
