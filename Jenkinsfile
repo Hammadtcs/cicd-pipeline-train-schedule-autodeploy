@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Running build automation'
+                echo "Running build automation on branch: ${env.BRANCH_NAME}"
                 script {
                     docker.image('gradle:7.6.1-jdk8').inside {
                         sh './gradlew build --no-daemon'
@@ -20,7 +20,7 @@ pipeline {
 
         stage('Build Docker Image') {
             when {
-                branch 'release'
+                expression { return env.BRANCH_NAME ==~ /.*release.*/ }
             }
             steps {
                 script {
@@ -34,7 +34,7 @@ pipeline {
 
         stage('Push Docker Image') {
             when {
-                branch 'release'
+                expression { return env.BRANCH_NAME ==~ /.*release.*/ }
             }
             steps {
                 script {
@@ -48,7 +48,7 @@ pipeline {
 
         stage('CanaryDeploy') {
             when {
-                branch 'release'
+                expression { return env.BRANCH_NAME ==~ /.*release.*/ }
             }
             environment {
                 CANARY_REPLICAS = 1
@@ -64,7 +64,7 @@ pipeline {
 
         stage('DeployToProduction') {
             when {
-                branch 'release'
+                expression { return env.BRANCH_NAME ==~ /.*release.*/ }
             }
             environment {
                 CANARY_REPLICAS = 0
