@@ -1,8 +1,10 @@
 pipeline {
     agent any
+
     environment {
         DOCKER_IMAGE_NAME = "hammadtcs/train-schedule"
     }
+
     stages {
         stage('Build') {
             steps {
@@ -48,7 +50,7 @@ pipeline {
             when {
                 branch 'release'
             }
-            environment { 
+            environment {
                 CANARY_REPLICAS = 1
             }
             steps {
@@ -64,7 +66,7 @@ pipeline {
             when {
                 branch 'release'
             }
-            environment { 
+            environment {
                 CANARY_REPLICAS = 0
             }
             steps {
