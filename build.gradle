@@ -4,8 +4,8 @@ plugins {
 
 node {
     download = true
-    version = "18.18.0"
-    npmVersion = "9.8.1"
+    version = "16.20.2"         // Downgraded Node.js version
+    npmVersion = "8.19.4"       // Compatible npm version for Node 16
     // You can optionally set:
     // workDir = file("${project.buildDir}/nodejs")
     // npmWorkDir = file("${project.buildDir}/npm")
