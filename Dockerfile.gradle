@@ -1,11 +1,10 @@
-@"
 FROM openjdk:8
 
 # Install curl and unzip (needed by Gradle and Node)
 RUN apt-get update && apt-get install -y curl unzip
 
 # Install Gradle
-ENV GRADLE_VERSION 8.2.1
+ENV GRADLE_VERSION=8.2.1
 RUN curl -sL https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle.zip \
     && unzip gradle.zip -d /opt \
     && mv /opt/gradle-${GRADLE_VERSION} /opt/gradle \
@@ -13,6 +12,5 @@ RUN curl -sL https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-
     && rm gradle.zip
 
 # Set Gradle environment variables
-ENV GRADLE_HOME /opt/gradle
-ENV PATH \$PATH:/opt/gradle/bin
-"@ | Set-Content -Encoding UTF8 -Path Dockerfile.gradle
+ENV GRADLE_HOME=/opt/gradle
+ENV PATH=$PATH:/opt/gradle/bin
