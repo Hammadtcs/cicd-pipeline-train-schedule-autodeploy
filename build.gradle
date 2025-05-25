@@ -4,8 +4,8 @@ plugins {
 
 node {
     download = true
-    version = "18.16.0"        // Compatible Node.js version
-    npmVersion = "9.8.1"       // Known good npm version
+    version = "16.20.0"        // Compatible Node.js version
+    npmVersion = "8.19.4"       // Known good npm version
 }
 
 // declare a build task
