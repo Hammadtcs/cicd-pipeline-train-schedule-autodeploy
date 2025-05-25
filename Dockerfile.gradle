@@ -4,7 +4,7 @@ FROM openjdk:8
 RUN apt-get update && apt-get install -y curl unzip
 
 # Install Gradle
-ENV GRADLE_VERSION=8.2.1
+ENV GRADLE_VERSION=7.6
 RUN curl -sL https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle.zip \
     && unzip gradle.zip -d /opt \
     && mv /opt/gradle-${GRADLE_VERSION} /opt/gradle \
