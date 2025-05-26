@@ -13,7 +13,6 @@ spec:
     nodePort: 8081
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,7 +20,7 @@ metadata:
   labels:
     app: train-schedule
 spec:
-  replicas: $CANARY_REPLICAS
+  replicas: __CANARY_REPLICAS__
   selector:
     matchLabels:
       app: train-schedule
@@ -34,7 +33,7 @@ spec:
     spec:
       containers:
       - name: train-schedule
-        image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
+        image: __DOCKER_IMAGE_NAME__:__BUILD_NUMBER__
         ports:
         - containerPort: 8080
         livenessProbe:

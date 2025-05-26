@@ -44,12 +44,13 @@ pipeline {
             }
             steps {
                 script {
-                    sh """
-                        sed 's|\\$CANARY_REPLICAS|${CANARY_REPLICAS}|' train-schedule-kube-canary-template.yml |
-                        sed 's|\\$DOCKER_IMAGE_NAME|${DOCKER_IMAGE_NAME}|' |
-                        sed 's|\\$BUILD_NUMBER|${BUILD_NUMBER}|' > train-schedule-kube-canary.yml
-                    """
-                    sh 'kubectl apply -f train-schedule-kube-canary.yml --kubeconfig=$KUBECONFIG'
+                    def template = readFile('train-schedule-kube-canary-template.yml')
+                    def resolved = template
+                        .replace('__CANARY_REPLICAS__', "${CANARY_REPLICAS}")
+                        .replace('__DOCKER_IMAGE_NAME__', "${DOCKER_IMAGE_NAME}")
+                        .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
+                    writeFile file: 'train-schedule-kube-canary.yml', text: resolved
+                    sh 'kubectl apply -f train-schedule-kube-canary.yml'
                 }
             }
         }
@@ -62,16 +63,14 @@ pipeline {
                 input 'Deploy to Production?'
                 milestone(1)
                 script {
-                    sh """
-                        sed 's|\\$CANARY_REPLICAS|${CANARY_REPLICAS}|' train-schedule-kube-canary-template.yml |
-                        sed 's|\\$DOCKER_IMAGE_NAME|${DOCKER_IMAGE_NAME}|' |
-                        sed 's|\\$BUILD_NUMBER|${BUILD_NUMBER}|' > train-schedule-kube-canary.yml
-
-                        sed 's|\\$DOCKER_IMAGE_NAME|${DOCKER_IMAGE_NAME}|' train-schedule-kube-template.yml |
-                        sed 's|\\$BUILD_NUMBER|${BUILD_NUMBER}|' > train-schedule-kube.yml
-                    """
-                    sh 'kubectl apply -f train-schedule-kube-canary.yml --kubeconfig=$KUBECONFIG'
-                    sh 'kubectl apply -f train-schedule-kube.yml --kubeconfig=$KUBECONFIG'
+                    def template = readFile('train-schedule-kube-canary-template.yml')
+                    def resolved = template
+                        .replace('__CANARY_REPLICAS__', "${CANARY_REPLICAS}")
+                        .replace('__DOCKER_IMAGE_NAME__', "${DOCKER_IMAGE_NAME}")
+                        .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
+                    writeFile file: 'train-schedule-kube-canary.yml', text: resolved
+                    sh 'kubectl apply -f train-schedule-kube-canary.yml'
+                    sh 'kubectl apply -f train-schedule-kube.yml'
                 }
             }
         }
