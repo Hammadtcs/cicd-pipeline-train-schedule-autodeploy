@@ -21,7 +21,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}")
+                    // Force rebuild without cache
+                    app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "--no-cache .")
+                    // Also tag it as latest
+                    sh "docker tag ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:latest"
                 }
             }
         }
@@ -30,8 +33,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                        app.push()
-                        app.push("latest")
+                        sh "docker push ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}"
+                        sh "docker push ${DOCKER_IMAGE_NAME}:latest"
                     }
                 }
             }
