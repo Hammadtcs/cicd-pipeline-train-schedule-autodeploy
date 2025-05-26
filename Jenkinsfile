@@ -43,7 +43,9 @@ pipeline {
                 CANARY_REPLICAS = 1
             }
             steps {
-                sh 'kubectl apply -f train-schedule-kube-canary.yml'
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh 'kubectl apply -f train-schedule-kube-canary.yml --kubeconfig=$KUBECONFIG'
+                }
             }
         }
 
@@ -54,8 +56,10 @@ pipeline {
             steps {
                 input 'Deploy to Production?'
                 milestone(1)
-                sh 'kubectl apply -f train-schedule-kube-canary.yml'
-                sh 'kubectl apply -f train-schedule-kube.yml'
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh 'kubectl apply -f train-schedule-kube-canary.yml --kubeconfig=$KUBECONFIG'
+                    sh 'kubectl apply -f train-schedule-kube.yml --kubeconfig=$KUBECONFIG'
+                }
             }
         }
     }
