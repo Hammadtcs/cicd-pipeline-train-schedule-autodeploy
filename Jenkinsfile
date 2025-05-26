@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_NAME = "hammadtcs/train-schedule"
+        DOCKER_IMAGE_NAME = "hammaddockerhub/train-schedule"
     }
 
     stages {
@@ -21,10 +21,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    app = docker.build(DOCKER_IMAGE_NAME)
-                    app.inside {
-                        sh 'echo Hello, World!'
-                    }
+                    app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}")
                 }
             }
         }
@@ -32,8 +29,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        app.push("${env.BUILD_NUMBER}")
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                        app.push()
                         app.push("latest")
                     }
                 }
