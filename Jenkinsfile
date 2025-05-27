@@ -52,7 +52,7 @@ pipeline {
                     writeFile file: 'train-schedule-kube-canary.yml', text: resolved
 
                     withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
-                        sh 'kubectl --kubeconfig=$KUBECONFIG apply -f train-schedule-kube-canary.yml --insecure-skip-tls-verify'
+                        sh 'kubectl --kubeconfig=$KUBECONFIG apply -f train-schedule-kube-canary.yml --insecure-skip-tls-verify --validate=false'
                     }
                 }
             }
