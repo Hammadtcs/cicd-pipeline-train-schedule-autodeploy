@@ -51,8 +51,9 @@ pipeline {
                         .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
                     writeFile file: 'train-schedule-kube-canary.yml', text: resolved
 
-                    // 🔶 Added TLS skip options
-                    sh 'kubectl apply -f train-schedule-kube-canary.yml --validate=false --insecure-skip-tls-verify'
+                    withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
+                        sh 'kubectl --kubeconfig=$KUBECONFIG apply -f train-schedule-kube-canary.yml --insecure-skip-tls-verify'
+                    }
                 }
             }
         }
@@ -72,9 +73,10 @@ pipeline {
                         .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
                     writeFile file: 'train-schedule-kube-canary.yml', text: resolved
 
-                    // 🔶 Added TLS skip options
-                    sh 'kubectl apply -f train-schedule-kube-canary.yml --validate=false --insecure-skip-tls-verify'
-                    sh 'kubectl apply -f train-schedule-kube.yml --validate=false --insecure-skip-tls-verify'
+                    withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
+                        sh 'kubectl --kubeconfig=$KUBECONFIG apply -f train-schedule-kube-canary.yml --insecure-skip-tls-verify'
+                        sh 'kubectl --kubeconfig=$KUBECONFIG apply -f train-schedule-kube.yml --insecure-skip-tls-verify'
+                    }
                 }
             }
         }
