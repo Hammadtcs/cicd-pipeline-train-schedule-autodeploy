@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "--no-cache .")
+                    def app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "--no-cache .")
                     sh "docker tag ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:latest"
                 }
             }
@@ -66,12 +66,20 @@ pipeline {
                 input 'Deploy to Production?'
                 milestone(1)
                 script {
-                    def template = readFile('train-schedule-kube-canary-template.yml')
-                    def resolved = template
+                    // Update canary YAML with 0 replicas
+                    def canaryTemplate = readFile('train-schedule-kube-canary-template.yml')
+                    def resolvedCanary = canaryTemplate
                         .replace('__CANARY_REPLICAS__', "${CANARY_REPLICAS}")
                         .replace('__DOCKER_IMAGE_NAME__', "${DOCKER_IMAGE_NAME}")
                         .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
-                    writeFile file: 'train-schedule-kube-canary.yml', text: resolved
+                    writeFile file: 'train-schedule-kube-canary.yml', text: resolvedCanary
+
+                    // Generate and write production deployment file
+                    def prodTemplate = readFile('train-schedule-kube-template.yml')
+                    def resolvedProd = prodTemplate
+                        .replace('$DOCKER_IMAGE_NAME', "${DOCKER_IMAGE_NAME}")
+                        .replace('$BUILD_NUMBER', "${BUILD_NUMBER}")
+                    writeFile file: 'train-schedule-kube.yml', text: resolvedProd
 
                     withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
                         sh 'kubectl --kubeconfig=$KUBECONFIG apply -f train-schedule-kube-canary.yml --insecure-skip-tls-verify'
