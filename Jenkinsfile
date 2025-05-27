@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_NAME = "hammaddockerhub/train-schedule"
+        KUBECONFIG = credentials('kubeconfig-credentials') // Jenkins secret file credential
     }
 
     stages {
@@ -21,7 +22,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "--no-cache .")
+                    def app = docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "--no-cache .")
                     sh "docker tag ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:latest"
                 }
             }
@@ -50,7 +51,7 @@ pipeline {
                         .replace('__DOCKER_IMAGE_NAME__', "${DOCKER_IMAGE_NAME}")
                         .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
                     writeFile file: 'train-schedule-kube-canary.yml', text: resolved
-                    sh 'kubectl apply -f train-schedule-kube-canary.yml'
+                    sh 'kubectl --kubeconfig="$KUBECONFIG" apply -f train-schedule-kube-canary.yml'
                 }
             }
         }
@@ -69,8 +70,8 @@ pipeline {
                         .replace('__DOCKER_IMAGE_NAME__', "${DOCKER_IMAGE_NAME}")
                         .replace('__BUILD_NUMBER__', "${BUILD_NUMBER}")
                     writeFile file: 'train-schedule-kube-canary.yml', text: resolved
-                    sh 'kubectl apply -f train-schedule-kube-canary.yml'
-                    sh 'kubectl apply -f train-schedule-kube.yml'
+                    sh 'kubectl --kubeconfig="$KUBECONFIG" apply -f train-schedule-kube-canary.yml'
+                    sh 'kubectl --kubeconfig="$KUBECONFIG" apply -f train-schedule-kube.yml'
                 }
             }
         }
